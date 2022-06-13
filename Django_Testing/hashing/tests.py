@@ -1,6 +1,6 @@
 from django.test import TestCase
 from selenium import webdriver
-
+from .forms import HashForm
 
 class UnitTestCase(TestCase):
     def test_home_homepage_tempalte(self):
