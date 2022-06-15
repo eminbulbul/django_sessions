@@ -11,85 +11,124 @@ from .serializers import TodoSerializer
 
 from rest_framework import status
 
+
+from rest_framework.views import APIView
 # Create your views here.
-def home(request):
-    return HttpResponse(
-        '<center><h1 style="background-color:powderblue;">Welcome to ApiTodo</h1></center>'
-    )
+
+# def home(request):
+#     return HttpResponse(
+#         '<center><h1 style="background-color:powderblue;">Welcome to ApiTodo</h1></center>'
+#     )
 
 
-@api_view()
-def hello_world(request):
-    return Response({"message": "Hello, world!"})
+# @api_view()
+# def hello_world(request):
+#     return Response({"message": "Hello, world!"})
 
-@api_view(['GET'])
-def todoList(request):
-    querset =  Todo.objects.all()    
-    serializer = TodoSerializer(querset, many=True)
+# @api_view(['GET'])
+# def todoList(request):
+#     querset =  Todo.objects.all()    
+#     serializer = TodoSerializer(querset, many=True)
    
-    return Response(serializer.data)
+#     return Response(serializer.data)
 
 
-@api_view(['POST'])
-def todoCreate(request):
+# @api_view(['POST'])
+# def todoCreate(request):
 
-    serializer = TodoSerializer(data = request.data)
+#     serializer = TodoSerializer(data = request.data)
     
-    if serializer.is_valid():
-        serializer.save()
-    return Response(serializer.data)
+#     if serializer.is_valid():
+#         serializer.save()
+#     return Response(serializer.data)
 
 
-@api_view(['GET', 'POST'])
-def todoListCreate(request):
-    if request.method == "GET":
-        querset =  Todo.objects.all()    
-        serializer = TodoSerializer(querset, many=True)
+# @api_view(['GET', 'POST'])
+# def todoListCreate(request):
+#     if request.method == "GET":
+#         querset =  Todo.objects.all()    
+#         serializer = TodoSerializer(querset, many=True)
     
-        return Response(serializer.data)
+#         return Response(serializer.data)
     
-    elif request.method == "POST":
-        serializer = TodoSerializer(data = request.data)
+#     elif request.method == "POST":
+#         serializer = TodoSerializer(data = request.data)
     
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 
-@api_view(['GET','PUT', 'DELETE'])
-def todoUpdate(request, pk):
+# @api_view(['GET','PUT', 'DELETE'])
+# def todoUpdate(request, pk):
     
-    querset =  Todo.objects.get(id = pk)
+#     querset =  Todo.objects.get(id = pk)
     
-    if request.method == "GET":
-        serializer = TodoSerializer(querset)
+#     if request.method == "GET":
+#         serializer = TodoSerializer(querset)
     
-        return Response(serializer.data)
+#         return Response(serializer.data)
         
-    elif request.method == "PUT":
+#     elif request.method == "PUT":
         
-        serializer = TodoSerializer(instance=querset,  data = request.data)
+#         serializer = TodoSerializer(instance=querset,  data = request.data)
         
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
             
-        return Response(serializer.errors, status=status.HTTP_204_NO_CONTENT)
+#         return Response(serializer.errors, status=status.HTTP_204_NO_CONTENT)
     
-    elif request.method == "DELETE":
+#     elif request.method == "DELETE":
       
-        querset.delete()
-        return Response("Item Deleted")
+#         querset.delete()
+#         return Response("Item Deleted")
         
     
 
-@api_view(['DELETE'])
-def todoDelete(request, pk):
+# @api_view(['DELETE'])
+# def todoDelete(request, pk):
     
-    querset =  Todo.objects.get(id = pk)
-    querset.delete()
-    return Response("Item Deleted")
+#     querset =  Todo.objects.get(id = pk)
+#     querset.delete()
+#     return Response("Item Deleted")
     
-    
+
+#! Class Based Views
+
+class TodoList(APIView):
+
+    def get(self, request):
+        todos =  Todo.objects.all()    
+        serializer = TodoSerializer(todos, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):    
+        serializer = TodoSerializer(data = request.data)  
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.data)
+        
+class TodoDetail(APIView):
+    def get(self, request, id):
+        todo = Todo.objects.get(id=id)
+        serializer = TodoSerializer(todo)
+        return Response(serializer.data)
+
+    def put(self, request, id):
+        todo = Todo.objects.get(id=id)
+        serializer = TodoSerializer(instance=todo, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, id):
+        todo = Todo.objects.get(id=id)
+        todo.delete()
+        data = {
+            "message": "Todo succesfully deleted."
+        }
+        return Response(data, status=status.HTTP_204_NO_CONTENT)
