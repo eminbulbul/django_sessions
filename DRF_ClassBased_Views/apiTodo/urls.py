@@ -7,8 +7,8 @@ from .views import (
     # todoListCreate, 
     # todoUpdate, 
     # todoDelete,
-    TodoList,
-    TodoDetail,
+    TodoListCreate,
+    # TodoDetail,
 )
 
 
@@ -24,6 +24,6 @@ urlpatterns = [
     # path('todoDelete/<int:pk>/', todoDelete),
     
     #* Class Based Views
-    path("list/", TodoList.as_view()),
-    path("detail/<int:id>", TodoDetail.as_view()),
+    path("list/", TodoListCreate.as_view()),
+    # path("detail/<int:id>", TodoDetail.as_view()),
 ]
