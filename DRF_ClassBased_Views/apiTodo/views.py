@@ -11,9 +11,9 @@ from .serializers import TodoSerializer
 
 from rest_framework.views import APIView
 from rest_framework import status
-
-from rest_framework import mixins
-from rest_framework.generics import GenericAPIView,ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework import mixins, viewsets
+from rest_framework.generics import GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.decorators import action
 
 # Create your views here.
 def home(request):
@@ -133,23 +133,44 @@ def todoDelete(request, pk):
 #         }
 #         return Response(data, status=status.HTTP_204_NO_CONTENT)
 
-# class TodoList(mixins.ListModelMixin, mixins.CreateModelMixin,GenericAPIView):
+
+# class TodoList(mixins.ListModelMixin, mixins.CreateModelMixin, GenericAPIView):
 #     queryset = Todo.objects.all()
 #     serializer_class = TodoSerializer
-
+    
 #     def get(self, request, *args, **kwargs):
 #         return self.list(request, *args, **kwargs)
-
+    
 #     def post(self, request, *args, **kwargs):
 #         return self.create(request, *args, **kwargs)
-
-class TodoListCreate(ListCreateAPIView):
-    queryset = Todo.objects.all()
-    serializer_class = TodoSerializer
-
-
-class TodoGetUpdateDelete(RetrieveUpdateDestroyAPIView):
-    queryset = Todo.objects.all()
-    serializer_class = TodoSerializer
-    lookup_field = "id"  
     
+    
+    
+    
+# class TodoListCreate(ListCreateAPIView):
+#     queryset = Todo.objects.all()
+#     serializer_class = TodoSerializer
+    
+#     # def perform_create(self, serializer):
+#     #     serializer.save(user=self.request.user)
+    
+# class TodoGetUpdateDelete(RetrieveUpdateDestroyAPIView):
+#     queryset = Todo.objects.all()
+#     serializer_class = TodoSerializer
+#     lookup_field = "id"
+    
+
+class TodoMVS(viewsets.ModelViewSet):
+    queryset = Todo.objects.all()
+    serializer_class = TodoSerializer
+        
+    @action(methods=["GET"], detail=False)
+    def todo_count(self, request):
+        todo_count = Todo.objects.filter(done=False).count()
+        count = {
+            'undo-todos': todo_count
+        }
+        return Response(count)    
+
+
+        
