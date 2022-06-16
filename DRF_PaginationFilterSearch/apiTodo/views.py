@@ -16,7 +16,12 @@ from rest_framework.generics import GenericAPIView, ListCreateAPIView, RetrieveU
 from rest_framework.decorators import action
 
 # pagination classes:
-from .pagination import SmallPageNumberPagination, LargePageNumberPagination
+from .pagination import MyCursorPagination, MyLimitOffsetPagination, SmallPageNumberPagination, LargePageNumberPagination
+
+# filter backend
+from django_filters.rest_framework import DjangoFilterBackend
+
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 # Create your views here.
 def home(request):
@@ -167,7 +172,23 @@ class TodoMVS(viewsets.ModelViewSet):
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
 
-    pagination_class = SmallPageNumberPagination
+    # pagination_class = LargePageNumberPagination
+    # pagination_class = MyLimitOffsetPagination
+    # pagination_class = MyCursorPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['task', "priority"]
+    search_fields = ['task']
+    ordering_fields = ['task', "createdDate", "id"]
+
+
+    # def get_queryset(self):
+    #     queryset = Todo.objects.all()
+    #     priority = self.request.query_params.get('priority')
+    #     if priority is not None:
+    #         queryset = queryset.filter(priority=priority)
+    #     return queryset
+
+
         
     # @action(methods=["GET"], detail=False)
     # def todo_count(self, request):
