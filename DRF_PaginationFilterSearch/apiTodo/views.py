@@ -15,6 +15,9 @@ from rest_framework import mixins, viewsets
 from rest_framework.generics import GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.decorators import action
 
+# pagination classes:
+from .pagination import SmallPageNumberPagination, LargePageNumberPagination
+
 # Create your views here.
 def home(request):
     return HttpResponse(
@@ -25,25 +28,19 @@ def home(request):
 """ @api_view()
 def hello_world(request):
     return Response({"message": "Hello, world!"})
-
 @api_view(['GET'])
 def todoList(request):
     querset =  Todo.objects.all()    
     serializer = TodoSerializer(querset, many=True)
    
     return Response(serializer.data)
-
-
 @api_view(['POST'])
 def todoCreate(request):
-
     serializer = TodoSerializer(data = request.data)
     
     if serializer.is_valid():
         serializer.save()
     return Response(serializer.data)
-
-
 @api_view(['GET', 'POST'])
 def todoListCreate(request):
     if request.method == "GET":
@@ -62,7 +59,6 @@ def todoListCreate(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         
-
 @api_view(['GET','PUT', 'DELETE'])
 def todoUpdate(request, pk):
     
@@ -87,7 +83,6 @@ def todoUpdate(request, pk):
         return Response("Item Deleted")
         
     
-
 @api_view(['DELETE'])
 def todoDelete(request, pk):
     
@@ -171,15 +166,14 @@ def todoDelete(request, pk):
 class TodoMVS(viewsets.ModelViewSet):
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
-        
-    @action(methods=["GET"], detail=False)
-    def todo_count(self, request):
-        todo_count = Todo.objects.filter(done=False).count()
-        count = {
-            'undo-todos': todo_count
-        }
-        return Response(count)    
 
-
+    pagination_class = SmallPageNumberPagination
         
- 
+    # @action(methods=["GET"], detail=False)
+    # def todo_count(self, request):
+    #     todo_count = Todo.objects.filter(done=False).count()
+    #     count = {
+    #         'undo-todos': todo_count
+    #     }
+    #     return Response(count)    
+
